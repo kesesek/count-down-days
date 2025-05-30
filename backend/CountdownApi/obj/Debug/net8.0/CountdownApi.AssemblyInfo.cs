@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CountdownApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8684eb21b00f5c7b3a2f26232553d6f094b3bc56")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f14302f62de164f65cfc163b466b0e4c9e736469")]
 [assembly: System.Reflection.AssemblyProductAttribute("CountdownApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CountdownApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
