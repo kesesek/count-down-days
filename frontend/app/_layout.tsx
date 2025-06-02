@@ -1,16 +1,18 @@
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
+// import {
+//   DarkTheme,
+//   DefaultTheme,
+//   ThemeProvider,
+// } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
+import { router, Stack } from "expo-router";
+// import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 
-import { useColorScheme } from "@/hooks/useColorScheme";
+// import { useColorScheme } from "@/hooks/useColorScheme";
 
 import { Amplify } from "aws-amplify";
+import { useAuthStatus } from "@/hooks/useAuthStatus";
+import { useEffect } from "react";
 
 Amplify.configure({
   Auth: {
@@ -40,26 +42,29 @@ Amplify.configure({
 });
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  // const colorScheme = useColorScheme();
+  const isLoggedIn = useAuthStatus()
+  useEffect(() => {
+    if (isLoggedIn === true) {
+      router.replace("/home")
+    } else if (isLoggedIn === false) {
+      router.replace("/");
+    }
+  }, [isLoggedIn])
+
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
-  if (!loaded) {
+  if (!loaded || isLoggedIn === null) {
     // Async font loading only occurs in development.
     return null;
   }
 
   return (
-    // <Stack initialRouteName="login">
-    //   <Stack.Screen name="login" options={{ headerShown: false }} />
-    //   <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-    // </Stack>
-    <ThemeProvider value={colorScheme === "dark" ? DefaultTheme : DefaultTheme}>
-      <Stack initialRouteName="login">
-        <Stack.Screen name="login" options={{ headerShown: false }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <Stack>
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="home" options={{ headerShown: false }} />
+    </Stack>
   );
 }

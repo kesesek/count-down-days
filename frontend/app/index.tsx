@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, TextInput, Button, Alert } from "react-native";
-// import { router } from "expo-c";
+import { router } from "expo-router";
 import { signIn } from "aws-amplify/auth";
 
 export default function Login() {
@@ -9,11 +9,6 @@ export default function Login() {
 
   const handleLogin = async () => {
     try {
-      // const response = await signIn({ username: email, password: password });
-      // if (response.isSignedIn) {
-      //   Alert.alert("Login Success", "Token acquired.");
-      //   router.replace("/(tabs)");
-      // }
       const { nextStep: signInNextStep } = await signIn({
         username: email,
         password: password,
@@ -26,6 +21,8 @@ export default function Login() {
       if (signInNextStep.signInStep === "DONE") {
         console.log("Sign in successful!");
       }
+
+      router.replace("/home");
     } catch (error: any) {
       console.error("Login failed", error);
       Alert.alert("Login Failed", error.name || "Unknown error");
