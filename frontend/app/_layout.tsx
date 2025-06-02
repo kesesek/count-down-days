@@ -17,19 +17,19 @@ import { useEffect } from "react";
 Amplify.configure({
   Auth: {
     Cognito: {
-      userPoolId: "ap-southeast-2_FC8yzI751",
-      userPoolClientId: "3elcu0ag9rh0kbdgisgfbi0roi",
+      userPoolId: "ap-southeast-2_cEJD8eZPj",
+      userPoolClientId: "1ieafu6g8pu5rguqo9njvgbcq4",
       identityPoolId: "",
       loginWith: {
         email: true,
       },
       signUpVerificationMethod: "code",
       userAttributes: {
-        email: {
+        nickname: {
           required: true,
         },
       },
-      allowGuestAccess: true,
+      allowGuestAccess: false,
       passwordFormat: {
         minLength: 8,
         requireLowercase: false,
@@ -64,6 +64,7 @@ export default function RootLayout() {
   return (
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="register" options={{ headerShown: false }} />
       <Stack.Screen name="home" options={{ headerShown: false }} />
     </Stack>
   );
