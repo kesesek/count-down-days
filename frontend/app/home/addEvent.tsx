@@ -1,9 +1,9 @@
 import { View, Text } from "react-native";
 
-export default function Home() {
+export default function AddEvent() {
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>to do</Text>
+      <Text>➕ Add New Event</Text>
     </View>
   );
 }
