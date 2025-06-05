@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, TextInput, Button, Alert, Text } from "react-native";
+import { View, TextInput, Alert, Text, TouchableOpacity } from "react-native";
 import { router, Link } from "expo-router";
 import { signIn, fetchUserAttributes } from "aws-amplify/auth";
 import styles from "@/styles/userAuthStyles";
@@ -33,20 +33,23 @@ export default function Login() {
     } catch (error: any) {
       console.error("Login failed", error);
       const errorMsg = error.message.split(".");
-      const errorDetail = errorMsg.length > 1 ? errorMsg[1].trim() : error.message;
+      const errorDetail =
+        errorMsg.length > 1 ? errorMsg[1].trim() : error.message;
       Alert.alert("Login Failed", errorDetail || "Unknown error");
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={{}}>{"Welcome!"}</Text>
+      <Text style={styles.title}>{"Welcome Back"}</Text>
       <TextInput
         placeholder="Email"
         onChangeText={setEmail}
         value={email}
         autoCapitalize="none"
+        keyboardType="email-address"
         style={styles.input}
+        placeholderTextColor="#666"
       />
       <TextInput
         placeholder="Password"
@@ -54,9 +57,17 @@ export default function Login() {
         value={password}
         secureTextEntry
         style={styles.input}
+        placeholderTextColor="#666"
       />
-      <Button title="Login" onPress={handleLogin} />
-      <Text style={styles.text}>{"Don't have an account?"}<Link href={'/register'} style={styles.link}>Register here</Link></Text>
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <Text style={styles.buttonText}>LOGIN</Text>
+      </TouchableOpacity>
+      <Text style={styles.footerText}>
+        {"Don't have an account?"}
+        <Link href="/register" style={styles.link}>
+          Register here
+        </Link>
+      </Text>
     </View>
   );
 }

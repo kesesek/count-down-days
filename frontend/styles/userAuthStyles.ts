@@ -2,21 +2,45 @@ import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
   container: {
-    padding: 20,
-    marginTop: 60,
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingTop: 180,
+    backgroundColor: "#fff",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "600",
+    marginBottom: 30,
+    textAlign: "center",
   },
   input: {
-    marginBottom: 10,
     borderWidth: 1,
-    padding: 8,
-    borderRadius: 6,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    fontSize: 16,
+    backgroundColor: "#fafafa",
   },
-  text: {
-    marginTop: 20,
+  button: {
+    marginTop: 40,
+    backgroundColor: "#000",
+    paddingVertical: 15,
+    alignItems: "center",
+    borderRadius: 8,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  footerText: {
+    marginTop: 24,
     fontSize: 14,
+    textAlign: "center",
   },
   link: {
-    color: "blue",
+    color: "#007bff",
     textDecorationLine: "underline",
   },
 });

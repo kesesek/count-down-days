@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { View, TextInput, Button, Alert, Text } from "react-native";
+import {
+  View,
+  TextInput,
+  Alert,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 import { router, Link } from "expo-router";
 import { signUp } from "aws-amplify/auth";
 import styles from "@/styles/userAuthStyles";
@@ -30,14 +36,15 @@ export default function Login() {
       console.error("register failed", error);
 
       const errorMsg = error.message.split(".");
-      const errorDetail = errorMsg.length > 1 ? errorMsg[1].trim() : error.message;
+      const errorDetail =
+        errorMsg.length > 1 ? errorMsg[1].trim() : error.message;
       Alert.alert("Register Failed", errorDetail || "Unknown error");
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={{}}>{"Welcome!"}</Text>
+      <Text style={styles.title}>{"Welcome"}</Text>
       <TextInput
         placeholder="Name"
         placeholderTextColor="#666"
@@ -63,8 +70,10 @@ export default function Login() {
         secureTextEntry
         style={styles.input}
       />
-      <Button title="Register" onPress={handleRegister} />
-      <Text style={styles.text}>
+      <TouchableOpacity style={styles.button} onPress={handleRegister}>
+        <Text style={styles.buttonText}>REGISTER</Text>
+      </TouchableOpacity>
+      <Text style={styles.footerText}>
         {"Already have an account?"}
         <Link href={"/"} style={styles.link}>
           Login
