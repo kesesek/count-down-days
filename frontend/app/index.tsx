@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { View, TextInput, Button, Alert, Text } from "react-native";
 import { router, Link } from "expo-router";
-import { signIn } from "aws-amplify/auth";
+import { signIn, fetchUserAttributes } from "aws-amplify/auth";
 import styles from "@/styles/userAuthStyles";
+import { saveToSecureStore } from "@/utils/storage";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -22,6 +23,11 @@ export default function Login() {
       if (signInNextStep.signInStep === "DONE") {
         console.log("Sign in successful!");
       }
+
+      const attributes = await fetchUserAttributes();
+      const nickname = attributes.nickname || "";
+      await saveToSecureStore("email", email);
+      await saveToSecureStore("nickname", nickname);
 
       router.replace("/home");
     } catch (error: any) {
