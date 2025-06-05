@@ -1,9 +1,76 @@
-import { View, Text } from "react-native";
+import React, { useState, useRef } from "react";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { format } from "date-fns";
+import {
+  View,
+  Text,
+  TextInput,
+  Switch,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+} from "react-native";
+import styles from "@/styles/addEventStyles";
 
 export default function AddEvent() {
+  const inputRef = useRef<TextInput>(null);
+  const [eventname, setEventName] = useState("");
+  const [targetDate, setTargetDate] = useState("");
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [isPinned, setIsPinned] = useState(false);
+
+  const showDatePicker = () => setDatePickerVisibility(true);
+  const hideDatePicker = () => setDatePickerVisibility(false);
+
+  const handleConfirm = (date: Date) => {
+    const formatted = format(date, "yyyy-MM-dd");
+    setTargetDate(formatted);
+    hideDatePicker();
+  };
+
+  const handleAddEvent = () => {
+    // to do
+    console.log({ eventname, targetDate, isPinned });
+  };
+
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>➕ Add New Event</Text>
+    <View style={styles.container}>
+      {/* make TextInput get input focus */}
+      <TouchableWithoutFeedback onPress={() => inputRef.current?.focus()}> 
+        <View style={styles.row}>
+          <TextInput
+            ref={inputRef}
+            value={eventname}
+            onChangeText={setEventName}
+            style={styles.input}
+            placeholder="Enter event name"
+            maxLength={30}
+          />
+        </View>
+      </TouchableWithoutFeedback>
+
+      <TouchableOpacity onPress={showDatePicker}>
+        <View style={styles.row}>
+          <Text style={styles.dateText}>
+            {targetDate || "Select target date"}
+          </Text>
+        </View>
+      </TouchableOpacity>
+
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="date"
+        onConfirm={handleConfirm}
+        onCancel={hideDatePicker}
+      />
+
+      <View style={styles.row}>
+        <Text style={styles.label}>Pin this event</Text>
+        <Switch value={isPinned} onValueChange={setIsPinned} />
+      </View>
+
+      <TouchableOpacity style={styles.button} onPress={handleAddEvent}>
+        <Text style={styles.buttonText}>Add Event</Text>
+      </TouchableOpacity>
     </View>
   );
 }
