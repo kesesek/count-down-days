@@ -4,20 +4,20 @@ set -e
 
 # get function name
 FUNCTION_NAME="$1"
-LAMBDA_DIR="lambda/$FUNCTION_NAME"
-ZIP_FILE="$LAMBDA_DIR/${FUNCTION_NAME}.zip"
 
-# check handler.py exists or not
-if [ ! -f "$LAMBDA_DIR/handler.py" ]; then
-  echo "❌ handler.py not found in $LAMBDA_DIR"
+SRC_DIR="lambda_src/$FUNCTION_NAME"
+ZIP_PATH="$SRC_DIR/${FUNCTION_NAME}.zip"
+
+if [ ! -f "$SRC_DIR/handler.py" ]; then
+  echo "❌ handler.py not found in $SRC_DIR"
   exit 1
 fi
 
 echo "📦 Packaging Lambda function: $FUNCTION_NAME"
 
-rm -f "$ZIP_FILE"
+rm -f "$ZIP_PATH"
 
-cd "$LAMBDA_DIR"
+cd "$SRC_DIR"
 
 # check if needs to pack dependencies
 if [ -f "requirements.txt" ]; then
@@ -25,16 +25,15 @@ if [ -f "requirements.txt" ]; then
   mkdir -p temp_package
   pip install -r requirements.txt -t temp_package
 
-  echo "📦 Zipping handler.py and dependencies..."
+  echo "📦 Zipping handler and dependencies..."
   cd temp_package
-  zip -r9 "../${FUNCTION_NAME}.zip" .
+  zip -r9 "../${FUNCTION_NAME}.zip" . > /dev/null
   cd ..
-  zip -g "${FUNCTION_NAME}.zip" handler.py
-
+  zip -g "${FUNCTION_NAME}.zip" handler.py > /dev/null
   rm -rf temp_package
 else
   echo "📦 Zipping handler.py only (no dependencies)"
-  zip "${FUNCTION_NAME}.zip" handler.py
+  zip "${FUNCTION_NAME}.zip" handler.py > /dev/null
 fi
 
-echo "✅ Done: ${ZIP_FILE}"
+echo "✅ Done: $ZIP_PATH"
