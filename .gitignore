@@ -1,0 +1,7 @@
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+aws-lambda-env
+# Lambda zip artifacts
+lambda/**/*.zip
