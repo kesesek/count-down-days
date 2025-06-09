@@ -8,7 +8,10 @@ import {
   Switch,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  Alert,
 } from "react-native";
+import { router } from "expo-router";
+import { fetchAuthSession } from "aws-amplify/auth";
 import styles from "@/styles/addEventStyles";
 
 export default function AddEvent() {
@@ -27,15 +30,41 @@ export default function AddEvent() {
     hideDatePicker();
   };
 
-  const handleAddEvent = () => {
-    // to do
+  const handleAddEvent = async () => {
+    const session = await fetchAuthSession();
+    const idToken = session.tokens?.idToken?.toString();
+
+    try {
+      const response = await fetch("https://okuyjuj7n6.execute-api.ap-southeast-2.amazonaws.com/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({
+          title: eventname,
+          targetDate: targetDate,
+          isPinned: isPinned,
+        }),
+      });
+
+      if (response.ok) {
+        Alert.alert("Sucess", "Event added.");
+        router.push("/home");
+      } else {
+        const error = await response.text();
+        Alert.alert("Error", error);
+      }
+    } catch (error: any) {
+      Alert.alert("Error", error);
+    }
     console.log({ eventname, targetDate, isPinned });
   };
 
   return (
     <View style={styles.container}>
       {/* make TextInput get input focus */}
-      <TouchableWithoutFeedback onPress={() => inputRef.current?.focus()}> 
+      <TouchableWithoutFeedback onPress={() => inputRef.current?.focus()}>
         <View style={styles.row}>
           <TextInput
             ref={inputRef}
@@ -74,3 +103,12 @@ export default function AddEvent() {
     </View>
   );
 }
+
+//  resource "aws_api_gateway_deployment" "api_deployment" {
+//     created_date  = "2025-06-08T04:14:44Z"
+//     description   = null
+//     execution_arn = "arn:aws:execute-api:ap-southeast-2:851725428729:okuyjuj7n6/"
+//     id            = "dfwr4o"
+//     invoke_url    = "https://okuyjuj7n6.execute-api.ap-southeast-2.amazonaws.com/"
+//     rest_api_id   = "okuyjuj7n6"
+// }

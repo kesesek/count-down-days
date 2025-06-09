@@ -12,7 +12,16 @@ resource "aws_api_gateway_method" "post_method" {
   rest_api_id   = aws_api_gateway_rest_api.create_event_api.id
   resource_id   = aws_api_gateway_resource.create_event_resource.id
   http_method   = "POST"
-  authorization = "NONE"
+  authorization = "COGNITO_USER_POOLS"
+  authorizer_id = aws_api_gateway_authorizer.cognito_authorizer.id
+}
+
+resource "aws_api_gateway_authorizer" "cognito_authorizer" {
+  name                    = "CognitoAuthorizer"
+  rest_api_id             = aws_api_gateway_rest_api.create_event_api.id
+  identity_source         = "method.request.header.Authorization"
+  type                    = "COGNITO_USER_POOLS"
+  provider_arns           = [var.user_pool_arn]
 }
 
 resource "aws_api_gateway_integration" "lambda_integration" {
@@ -44,5 +53,5 @@ resource "aws_api_gateway_stage" "prod" {
 }
 
 output "create_event_api_url" {
-  value = "https://${aws_api_gateway_rest_api.create_event_api.id}.execute-api.${var.region}.amazonaws.com/${aws_api_gateway_stage.prod.stage_name}/create-event"
+  value = "https://${aws_api_gateway_rest_api.create_event_api.id}.execute-api.${var.aws_region}.amazonaws.com/${aws_api_gateway_stage.prod.stage_name}/create-event"
 }

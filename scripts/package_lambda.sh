@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# cmd line like: bash scripts/package_lambda.sh create_event
 set -e
 
 # get function name

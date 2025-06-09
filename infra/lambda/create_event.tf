@@ -33,7 +33,9 @@ resource "aws_lambda_function" "create_event" {
 
   environment {
     variables = {
-      TABLE_NAME = "your-dynamodb-table-name"
+      DYNAMO_TABLE_NAME = var.dynamo_table_name
+      COGNITO_JWT_ISSUER = "https://cognito-idp.${var.aws_region}.amazonaws.com/${var.user_pool_id}"
+      COGNITO_JWT_AUDIENCE = var.app_client_id
     }
   }
 }

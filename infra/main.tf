@@ -1,15 +1,21 @@
 provider "aws" {
-  region = "ap-southeast-2"
+  region = var.aws_region
 }
 
 module "lambda_create_event" {
-  source = "./lambda"
+  source            = "./lambda"
+  aws_region        = var.aws_region
+  dynamo_table_name = var.dynamo_table_name
+  user_pool_id      = var.user_pool_id
+  app_client_id     = var.app_client_id
 }
+
 module "api_gateway_create_event" {
-  source      = "./api_gateway"
-  lambda_arn  = module.lambda_create_event.create_event_lambda_arn
-  lambda_name = module.lambda_create_event.create_event_lambda_name
-  region      = var.region
+  source        = "./api_gateway"
+  lambda_arn    = module.lambda_create_event.create_event_lambda_arn
+  lambda_name   = module.lambda_create_event.create_event_lambda_name
+  aws_region    = var.aws_region
+  user_pool_arn = var.user_pool_arn
 }
 
 resource "aws_dynamodb_table" "events" {
