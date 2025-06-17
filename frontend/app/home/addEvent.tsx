@@ -103,12 +103,3 @@ export default function AddEvent() {
     </View>
   );
 }
-
-//  resource "aws_api_gateway_deployment" "api_deployment" {
-//     created_date  = "2025-06-08T04:14:44Z"
-//     description   = null
-//     execution_arn = "arn:aws:execute-api:ap-southeast-2:851725428729:okuyjuj7n6/"
-//     id            = "dfwr4o"
-//     invoke_url    = "https://okuyjuj7n6.execute-api.ap-southeast-2.amazonaws.com/"
-//     rest_api_id   = "okuyjuj7n6"
-// }

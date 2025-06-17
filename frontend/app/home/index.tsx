@@ -26,7 +26,7 @@ export default function Home() {
 
   return (
     <View style={styles.container}>
-      {/* 顶部摘要 */}
+      {/* top summary: the most urgent event */}
       <View style={styles.topSummary}>
         <Text style={styles.daysText}>{topEvent.daysDiff}</Text>
         <Text style={styles.eventName}>{topEvent.name}</Text>
@@ -35,10 +35,10 @@ export default function Home() {
         </Text>
       </View>
 
-      {/* 分割线 */}
+      {/* divider */}
       <View style={styles.divider} />
 
-      {/* 列表 */}
+      {/* event list */}
       <FlatList
         data={sortedEvents}
         keyExtractor={(item, index) => index.toString()}
