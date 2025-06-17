@@ -6,3 +6,5 @@ infra/*.tfvars
 aws-lambda-env
 # Lambda zip artifacts
 lambda/**/*.zip
+*.zip
+*.backup

@@ -23,9 +23,9 @@ resource "aws_iam_policy_attachment" "lambda_logs" {
 
 resource "aws_lambda_function" "create_event" {
   function_name = "create_event"
-  filename      = "${path.module}/../../lambda_src/create_event/create_event.zip"
+  filename      = "${path.module}/../../../lambda_src/create_event/create_event.zip"
   handler       = "handler.lambda_handler"
-  source_code_hash = filebase64sha256("${path.module}/../../lambda_src/create_event/create_event.zip")
+  source_code_hash = filebase64sha256("${path.module}/../../../lambda_src/create_event/create_event.zip")
 
   runtime = "python3.11"
   role    = aws_iam_role.lambda_exec_role.arn
@@ -38,12 +38,4 @@ resource "aws_lambda_function" "create_event" {
       COGNITO_JWT_AUDIENCE = var.app_client_id
     }
   }
-}
-
-output "create_event_lambda_arn" {
-  value = aws_lambda_function.create_event.invoke_arn
-}
-
-output "create_event_lambda_name" {
-  value = aws_lambda_function.create_event.function_name
 }

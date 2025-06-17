@@ -35,7 +35,7 @@ export default function AddEvent() {
     const idToken = session.tokens?.idToken?.toString();
 
     try {
-      const response = await fetch("https://okuyjuj7n6.execute-api.ap-southeast-2.amazonaws.com/", {
+      const response = await fetch("https://1qfztd2il1.execute-api.ap-southeast-2.amazonaws.com/prod/create-event", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
