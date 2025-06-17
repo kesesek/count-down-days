@@ -1,10 +1,16 @@
 import json, boto3, os, uuid, jwt
 from datetime import datetime
+from jwt import PyJWKClient
 
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ["DYNAMO_TABLE_NAME"])
 COGNITO_JWT_ISSUER = os.environ["COGNITO_JWT_ISSUER"]
 COGNITO_JWT_AUDIENCE = os.environ["COGNITO_JWT_AUDIENCE"]
+COGNITO_REGION = os.environ["COGNITO_REGION"]
+COGNITO_USERPOOL_ID = os.environ["COGNITO_USERPOOL_ID"]
+
+JWK_URL = f"https://cognito-idp.{COGNITO_REGION}.amazonaws.com/{COGNITO_USERPOOL_ID}/.well-known/jwks.json"
+jwk_client = PyJWKClient(JWK_URL)
 
 def lambda_handler(event, context):
     try:
@@ -13,7 +19,15 @@ def lambda_handler(event, context):
             return {"statusCode": 401, "body": json.dumps({"error": "Missing or invalid token"})}
         token = auth_header.split(" ")[1]
 
-        decoded_token = jwt.decoded(token, options={"verify_signature": False}, audience=COGNITO_JWT_AUDIENCE)
+        signing_key = jwk_client.get_signing_key_from_jwt(token).key
+
+        decoded_token = jwt.decode(
+            token,
+            signing_key,
+            algorithms=["RS256"],
+            audience=COGNITO_JWT_AUDIENCE,
+            issuer=f"https://cognito-idp.{COGNITO_REGION}.amazonaws.com/{COGNITO_USERPOOL_ID}"
+        )
 
         user_email = decoded_token.get("username")
         if not user_email:
@@ -39,3 +53,7 @@ def lambda_handler(event, context):
 
     except Exception as e:
         return {"statusCode": 500, "body": json.dumps({"error": str(e)})}
+    except jwt.ExpiredSignatureError:
+        return {"statusCode": 401, "body": json.dumps({"error": "Token expired"})}
+    except jwt.InvalidTokenError as e:
+        return {"statusCode": 403, "body": json.dumps({"error": f"Invalid token: {str(e)}"})}

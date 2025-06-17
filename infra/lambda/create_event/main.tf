@@ -36,6 +36,8 @@ resource "aws_lambda_function" "create_event" {
       DYNAMO_TABLE_NAME = var.dynamo_table_name
       COGNITO_JWT_ISSUER = "https://cognito-idp.${var.aws_region}.amazonaws.com/${var.user_pool_id}"
       COGNITO_JWT_AUDIENCE = var.app_client_id
+      COGNITO_REGION = var.aws_region
+      COGNITO_USERPOOL_ID = var.user_pool_id
     }
   }
 }

@@ -43,3 +43,28 @@ data "archive_file" "get_events_zip" {
   source_file = "${path.module}/../../../lambda_src/get_events/handler.py"
   output_path = "${path.module}/../../../lambda_src/get_events/get_events.zip"
 }
+
+data "aws_caller_identity" "current" {}
+
+resource "aws_iam_policy" "dynamodb_query_policy" {
+  name = "get_events_dynamodb_query"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement: [
+      {
+        Action = [
+          "dynamodb:Query"
+        ],
+        Effect   = "Allow",
+        Resource = "arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/${var.dynamo_table_name}"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy_attachment" "attach_dynamodb_query_policy" {
+  name       = "attach_dynamodb_query_policy"
+  roles      = [aws_iam_role.lambda_exec_role_get_events.name]
+  policy_arn = aws_iam_policy.dynamodb_query_policy.arn
+}
