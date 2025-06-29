@@ -43,8 +43,8 @@ export default function AddEvent() {
         },
         body: JSON.stringify({
           title: eventname,
-          targetDate: targetDate,
-          isPinned: isPinned,
+          target_date: targetDate,
+          is_pinned: isPinned,
         }),
       });
 

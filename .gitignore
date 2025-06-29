@@ -5,6 +5,7 @@ terraform.tfstate.backup
 infra/*.tfvars
 aws-lambda-env
 # Lambda zip artifacts
-lambda/**/*.zip
+lambda_src/**/*.zip
 *.zip
 *.backup
+lambda_src/**/build

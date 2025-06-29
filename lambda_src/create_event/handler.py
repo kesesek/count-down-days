@@ -29,23 +29,23 @@ def lambda_handler(event, context):
             issuer=f"https://cognito-idp.{COGNITO_REGION}.amazonaws.com/{COGNITO_USERPOOL_ID}"
         )
 
-        user_email = decoded_token.get("username")
+        user_email = decoded_token.get("email")
         if not user_email:
             return {"statusCode": 400, "body": json.dumps({"error": "User email not found in token"})}
         
         body = json.loads(event["body"])
         title = body["title"]
-        target_date = body["targetDate"]
-        is_pinned = body.get("isPinned", False)
+        target_date = body["target_date"]
+        is_pinned = body.get("is_pinned", False)
 
         item = {
-                "eventId": str(uuid.uuid4()),
-                "userEmail": user_email,
-                "title": title,
-                "targetDate": target_date,
-                "isPinned": is_pinned,
-                "createAt": datetime.utcnow().isoformat(),
-            }
+            "user_id": user_email,
+            "event_id": str(uuid.uuid4()),
+            "title": title,
+            "target_date": target_date,
+            "is_pinned": is_pinned,
+            "created_at": datetime.utcnow().isoformat(),
+        }
 
         table.put_item(Item=item)
 

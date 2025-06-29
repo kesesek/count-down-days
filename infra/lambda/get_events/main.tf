@@ -27,7 +27,7 @@ resource "aws_lambda_function" "get_events" {
   handler          = "handler.lambda_handler"
   source_code_hash = filebase64sha256("${path.module}/../../../lambda_src/get_events/get_events.zip")
 
-  runtime = "python3.11"
+  runtime = "python3.9"
   role    = aws_iam_role.lambda_exec_role_get_events.arn
   timeout = 10
 

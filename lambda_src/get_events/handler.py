@@ -1,18 +1,20 @@
 import boto3, os, json
+from boto3.dynamodb.conditions import Key
 
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ["DYNAMODB_TABLE_NAME"])
 
 def lambda_handler(event, context):
     try:
-        claims = event['requestContext']['authorizer']['claims']
-        user_id = claims['email']
+        claims = event["requestContext"]["authorizer"]["claims"]
+        user_id = claims["email"]
 
         response = table.query(
-            KeyConditionExpression=boto3.dynamodb.conditions.Key('user_id').eq(user_id)
+            KeyConditionExpression=Key("user_id").eq(user_id)
         )
 
         items = response.get("Items", [])
+
         return {
             "statusCode": 200,
             "headers": {"Access-Control-Allow-Origin": "*"},

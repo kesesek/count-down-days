@@ -1,5 +1,13 @@
 #!/bin/bash
-# cmd line like: bash scripts/package_lambda.sh create_event
+# Use Docker with the AWS Lambda build image
+# because installing Python packages produces binaries incompatible with Lambda’s Amazon Linux runtime.(Lead to ELF error)
+
+# cmd line like:
+# docker run --rm -it \
+# -v "$PWD":/var/task \
+# public.ecr.aws/sam/build-python3.9 \
+# bash -c "pip install -r requirements.txt -t build/ && cp handler.py build/ && cd build && zip -r ../create_event.zip ."
+
 set -e
 
 # get function name
@@ -23,7 +31,10 @@ cd "$SRC_DIR"
 if [ -f "requirements.txt" ]; then
   echo "📦 Installing dependencies from requirements.txt"
   mkdir -p temp_package
-  pip install -r requirements.txt -t temp_package
+
+  docker run --rm -v "$PWD":/var/task \
+    lambci/lambda:build-python3.9 \
+    pip install -r requirements.txt -t temp_package
 
   echo "📦 Zipping handler and dependencies..."
   cd temp_package
