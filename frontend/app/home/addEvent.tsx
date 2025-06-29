@@ -50,7 +50,8 @@ export default function AddEvent() {
 
       if (response.ok) {
         Alert.alert("Sucess", "Event added.");
-        router.push("/home");
+        // Go back to the last page
+        router.back();
       } else {
         const error = await response.text();
         Alert.alert("Error", error);
