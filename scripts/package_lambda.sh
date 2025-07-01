@@ -1,50 +1,60 @@
 #!/bin/bash
-# Use Docker with the AWS Lambda build image
-# because installing Python packages produces binaries incompatible with Lambda’s Amazon Linux runtime.(Lead to ELF error)
-
-# cmd line like:
-# docker run --rm -it \
-# -v "$PWD":/var/task \
-# public.ecr.aws/sam/build-python3.9 \
-# bash -c "pip install -r requirements.txt -t build/ && cp handler.py build/ && cd build && zip -r ../create_event.zip ."
-
 set -e
 
-# get function name
+# 📌 Usage: bash scripts/package_lambda.sh create_event
 FUNCTION_NAME="$1"
-
 SRC_DIR="lambda_src/$FUNCTION_NAME"
-ZIP_PATH="$SRC_DIR/${FUNCTION_NAME}.zip"
+ZIP_FILE="${FUNCTION_NAME}.zip"
+ZIP_PATH="$SRC_DIR/$ZIP_FILE"
 
+# 🔍 Check if handler.py exists
 if [ ! -f "$SRC_DIR/handler.py" ]; then
   echo "❌ handler.py not found in $SRC_DIR"
   exit 1
 fi
 
 echo "📦 Packaging Lambda function: $FUNCTION_NAME"
-
 rm -f "$ZIP_PATH"
 
-cd "$SRC_DIR"
+pushd "$SRC_DIR" > /dev/null
 
-# check if needs to pack dependencies
+# 🧪 If requirements.txt exists, use Docker to build dependencies
 if [ -f "requirements.txt" ]; then
-  echo "📦 Installing dependencies from requirements.txt"
+  echo "📦 Detected requirements.txt. Building with Docker..."
+
   mkdir -p temp_package
 
-  docker run --rm -v "$PWD":/var/task \
-    lambci/lambda:build-python3.9 \
-    pip install -r requirements.txt -t temp_package
+  docker run --rm \
+    -v "$PWD":/var/task \
+    public.ecr.aws/sam/build-python3.9 \
+    bash -c "pip install -r requirements.txt -t temp_package"
 
-  echo "📦 Zipping handler and dependencies..."
-  cd temp_package
-  zip -r9 "../${FUNCTION_NAME}.zip" . > /dev/null
-  cd ..
-  zip -g "${FUNCTION_NAME}.zip" handler.py > /dev/null
+  pushd temp_package > /dev/null
+  zip -r9 "../$ZIP_FILE" . > /dev/null
+  popd > /dev/null
+
+  zip -g "$ZIP_FILE" handler.py > /dev/null
   rm -rf temp_package
 else
-  echo "📦 Zipping handler.py only (no dependencies)"
-  zip "${FUNCTION_NAME}.zip" handler.py > /dev/null
+  echo "📦 No requirements.txt found. Zipping handler.py only..."
+  zip "$ZIP_FILE" handler.py > /dev/null
 fi
 
+popd > /dev/null
 echo "✅ Done: $ZIP_PATH"
+du -h "$ZIP_PATH"
+
+# 🚨 Remove outdated policy attachment from Terraform state
+echo "🧹 Cleaning Terraform state (if needed)..."
+
+if [[ "$FUNCTION_NAME" == "create_event" ]]; then
+  terraform state rm module.lambda_create_event.aws_iam_policy_attachment.lambda_logs || true
+elif [[ "$FUNCTION_NAME" == "get_events" ]]; then
+  terraform state rm module.lambda_get_events.aws_iam_policy_attachment.lambda_logs_get_events || true
+else
+  echo "ℹ️ No matching state cleanup rule for $FUNCTION_NAME"
+fi
+
+echo "✅ Lambda '$FUNCTION_NAME' packaged and state cleaned."
+
+# cmd line like: bash scripts/package_lambda.sh create_event
