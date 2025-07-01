@@ -13,6 +13,9 @@ import {
 import { router } from "expo-router";
 import { fetchAuthSession } from "aws-amplify/auth";
 import styles from "@/styles/addEventStyles";
+import { API_BASE_URL } from "@env";
+
+const url = `${API_BASE_URL}/create-event`;
 
 export default function AddEvent() {
   const inputRef = useRef<TextInput>(null);
@@ -35,7 +38,7 @@ export default function AddEvent() {
     const idToken = session.tokens?.idToken?.toString();
 
     try {
-      const response = await fetch("https://1qfztd2il1.execute-api.ap-southeast-2.amazonaws.com/prod/create-event", {
+      const response = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

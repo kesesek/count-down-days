@@ -1,18 +1,26 @@
 import { StyleSheet } from "react-native";
 export default StyleSheet.create({
-    container: {
+  container: {
     flex: 1,
     backgroundColor: "#fff",
     padding: 24,
   },
   topSummary: {
     alignItems: "center",
-    marginBottom: 24,
+    marginBottom: 4,
   },
   daysText: {
-    fontSize: 64,
-    fontWeight: "700",
-    color: "#333",
+    fontSize: 48,
+    fontWeight: "bold",
+    color: "#000",
+    textAlign: "center",
+  },
+
+  diffHintText: {
+    fontSize: 14,
+    color: "#888",
+    textAlign: "center",
+    marginBottom: 4,
   },
   eventName: {
     fontSize: 20,
@@ -22,7 +30,7 @@ export default StyleSheet.create({
   eventDate: {
     fontSize: 14,
     color: "#666",
-    marginTop: 2,
+    marginTop: 10,
   },
   divider: {
     height: 1,
@@ -40,6 +48,7 @@ export default StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#000",
+    marginBottom: 4,
   },
   rowDate: {
     fontSize: 12,

@@ -2,13 +2,32 @@ import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, ActivityIndicator } from "react-native";
 import { fetchAuthSession } from "aws-amplify/auth";
 import styles from "@/styles/homeStyles";
+import { API_BASE_URL } from "@env";
 
-const today = new Date();
+const url = `${API_BASE_URL}/get-events`;
 
 function getDaysDiff(target: string) {
+  const today = new Date();
   const targetDate = new Date(target);
   const diffTime = targetDate.getTime() - today.getTime();
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}
+
+function getDiffPrefix(daysDiff: number): string {
+  if (daysDiff > 0) return "In";
+  if (daysDiff < 0) return "Past";
+  return "";
+}
+
+function getDayText(daysDiff: number): string {
+  if (daysDiff === 0) return "Today";
+  return `day${Math.abs(daysDiff) === 1 ? "" : "s"}`;
+}
+
+function getDiffLabel(daysDiff: number): string {
+  if (daysDiff > 0) return `In ${daysDiff} days`;
+  if (daysDiff < 0) return `Past ${Math.abs(daysDiff)} days`;
+  return "Today";
 }
 
 export default function Home() {
@@ -21,29 +40,30 @@ export default function Home() {
         const session = await fetchAuthSession();
         const token = session.tokens?.idToken?.toString();
 
-        const response = await fetch(
-          "https://1qfztd2il1.execute-api.ap-southeast-2.amazonaws.com/prod/get-events",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await fetch(url, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-        const contentType = response.headers.get("content-type");
-
-        if (response.ok && contentType?.includes("application/json")) {
+        if (
+          response.ok &&
+          response.headers.get("content-type")?.includes("application/json")
+        ) {
           const data = await response.json();
-          console.log("Fetched data:", data);
 
           const enriched = data
             .map((e: any) => ({
               ...e,
-              daysDiff: getDaysDiff(e.targetDate),
+              daysDiff: getDaysDiff(e.target_date),
+              createdAt: new Date(e.created_at),
             }))
-            .sort(
-              (a: any, b: any) => Math.abs(a.daysDiff) - Math.abs(b.daysDiff)
-            );
+            .sort((a: any, b: any) => {
+              if (a.is_pinned && !b.is_pinned) return -1;
+              if (!a.is_pinned && b.is_pinned) return 1;
+              return (
+                new Date(b.created_at).getTime() -
+                new Date(a.created_at).getTime()
+              );
+            });
 
           setEvents(enriched);
         } else {
@@ -75,10 +95,21 @@ export default function Home() {
       {/* top summary: the most urgent event */}
       {topEvent ? (
         <View style={styles.topSummary}>
-          <Text style={styles.daysText}>{topEvent.daysDiff}</Text>
-          <Text style={styles.eventName}>{topEvent.name}</Text>
+          <Text style={styles.daysText}>
+            {topEvent.daysDiff === 0 ? "Today" : Math.abs(topEvent.daysDiff)}
+          </Text>
+
+          <Text style={styles.diffHintText}>
+            {topEvent.daysDiff === 0
+              ? ""
+              : `${getDiffPrefix(topEvent.daysDiff)} ${getDayText(
+                  topEvent.daysDiff
+                )}`}
+          </Text>
+
+          <Text style={styles.eventName}>{topEvent.title}</Text>
           <Text style={styles.eventDate}>
-            Target date: {topEvent.targetDate}
+            Target date: {topEvent.target_date}
           </Text>
         </View>
       ) : (
@@ -95,12 +126,10 @@ export default function Home() {
         renderItem={({ item }) => (
           <View style={styles.eventRow}>
             <View>
-              <Text style={styles.rowTitle}>{item.name}</Text>
-              <Text style={styles.rowDate}>Target: {item.targetDate}</Text>
+              <Text style={styles.rowTitle}>{item.title}</Text>
+              <Text style={styles.rowDate}>Target: {item.target_date}</Text>
             </View>
-            <Text style={styles.rowDiff}>
-              {item.daysDiff > 0 ? `${item.daysDiff} days` : "Today"}
-            </Text>
+            <Text style={styles.rowDiff}>{getDiffLabel(item.daysDiff)}</Text>
           </View>
         )}
       />
