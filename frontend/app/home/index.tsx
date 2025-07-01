@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, FlatList, ActivityIndicator } from "react-native";
+import { useFocusEffect } from "expo-router";
 import { fetchAuthSession } from "aws-amplify/auth";
 import styles from "@/styles/homeStyles";
 import { API_BASE_URL } from "@env";
@@ -34,51 +35,58 @@ export default function Home() {
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const session = await fetchAuthSession();
-        const token = session.tokens?.idToken?.toString();
+  const fetchEvents = async () => {
+    try {
+      const session = await fetchAuthSession();
+      const token = session.tokens?.idToken?.toString();
 
-        const response = await fetch(url, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+      const response = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-        if (
-          response.ok &&
-          response.headers.get("content-type")?.includes("application/json")
-        ) {
-          const data = await response.json();
+      if (
+        response.ok &&
+        response.headers.get("content-type")?.includes("application/json")
+      ) {
+        const data = await response.json();
 
-          const enriched = data
-            .map((e: any) => ({
-              ...e,
-              daysDiff: getDaysDiff(e.target_date),
-              createdAt: new Date(e.created_at),
-            }))
-            .sort((a: any, b: any) => {
-              if (a.is_pinned && !b.is_pinned) return -1;
-              if (!a.is_pinned && b.is_pinned) return 1;
-              return (
-                new Date(b.created_at).getTime() -
-                new Date(a.created_at).getTime()
-              );
-            });
+        const enriched = data
+          .map((e: any) => ({
+            ...e,
+            daysDiff: getDaysDiff(e.target_date),
+            createdAt: new Date(e.created_at),
+          }))
+          .sort((a: any, b: any) => {
+            if (a.is_pinned && !b.is_pinned) return -1;
+            if (!a.is_pinned && b.is_pinned) return 1;
+            return (
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime()
+            );
+          });
 
-          setEvents(enriched);
-        } else {
-          const text = await response.text();
-          console.error("Non-JSON or error response:", text);
-        }
-      } catch (err) {
-        console.error("Failed to fetch events:", err);
-      } finally {
-        setLoading(false);
+        setEvents(enriched);
+      } else {
+        const text = await response.text();
+        console.error("Non-JSON or error response:", text);
       }
-    };
+    } catch (err) {
+      console.error("Failed to fetch events:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchEvents();
   }, []);
+
+  // update evnets
+  useFocusEffect(
+    useCallback(() => {
+      fetchEvents();
+    }, [])
+  );
 
   if (loading) {
     return (
@@ -95,17 +103,23 @@ export default function Home() {
       {/* top summary: the most urgent event */}
       {topEvent ? (
         <View style={styles.topSummary}>
-          <Text style={styles.daysText}>
-            {topEvent.daysDiff === 0 ? "Today" : Math.abs(topEvent.daysDiff)}
-          </Text>
-
-          <Text style={styles.diffHintText}>
-            {topEvent.daysDiff === 0
-              ? ""
-              : `${getDiffPrefix(topEvent.daysDiff)} ${getDayText(
-                  topEvent.daysDiff
-                )}`}
-          </Text>
+          <View style={styles.diffRow}>
+            {topEvent.daysDiff === 0 ? (
+              <Text style={styles.diffHintText}>Today</Text>
+            ) : (
+              <>
+                <Text style={styles.diffHintText}>
+                  {getDiffPrefix(topEvent.daysDiff)}{" "}
+                </Text>
+                <Text style={styles.daysText}>
+                  {Math.abs(topEvent.daysDiff)}
+                </Text>
+                <Text style={styles.diffHintText}>
+                  {` ${getDayText(topEvent.daysDiff)}`}
+                </Text>
+              </>
+            )}
+          </View>
 
           <Text style={styles.eventName}>{topEvent.title}</Text>
           <Text style={styles.eventDate}>

@@ -9,18 +9,25 @@ export default StyleSheet.create({
     alignItems: "center",
     marginBottom: 4,
   },
+
+  diffRow: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "center",
+    marginBottom: 4,
+    gap: 10
+  },
   daysText: {
     fontSize: 48,
     fontWeight: "bold",
     color: "#000",
-    textAlign: "center",
   },
-
   diffHintText: {
     fontSize: 14,
     color: "#888",
-    textAlign: "center",
-    marginBottom: 4,
+    alignSelf: "flex-end",
+    paddingHorizontal: 2,
+    paddingBottom: 7,
   },
   eventName: {
     fontSize: 20,
@@ -60,4 +67,4 @@ export default StyleSheet.create({
     color: "#007AFF",
     alignSelf: "center",
   },
-})
+});

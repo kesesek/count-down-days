@@ -52,7 +52,7 @@ export default function AddEvent() {
       });
 
       if (response.ok) {
-        Alert.alert("Sucess", "Event added.");
+        // Alert.alert("Sucess", "Event added.");
         // Go back to the last page
         router.back();
       } else {
