@@ -3,9 +3,12 @@ import { View, Text, FlatList, ActivityIndicator } from "react-native";
 import { useFocusEffect } from "expo-router";
 import { fetchAuthSession } from "aws-amplify/auth";
 import styles from "@/styles/homeStyles";
-import { API_BASE_URL } from "@env";
 
-const url = `${API_BASE_URL}/get-events`;
+// Note: don't use react-native-dotenv. It's incompatible with expo-router.
+// However, as Expo official document said: Do not store sensitive info, such as private keys, in EXPO_PUBLIC_ variables. These variables will be visible in plain-text in your compiled application.
+// To do: find another way to store env variables.
+const base_url = process.env.EXPO_PUBLIC_API_BASE_URL ?? '';
+const url = `${base_url}/get-events`;
 
 function getDaysDiff(target: string) {
   const today = new Date();

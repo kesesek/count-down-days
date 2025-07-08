@@ -13,9 +13,11 @@ import {
 import { router } from "expo-router";
 import { fetchAuthSession } from "aws-amplify/auth";
 import styles from "@/styles/addEventStyles";
-import { API_BASE_URL } from "@env";
+// import { API_BASE_URL } from "@env";
 
-const url = `${API_BASE_URL}/create-event`;
+const base_url = process.env.API_BASE_URL;
+const url = base_url + "/create-event";
+
 
 export default function AddEvent() {
   const inputRef = useRef<TextInput>(null);
